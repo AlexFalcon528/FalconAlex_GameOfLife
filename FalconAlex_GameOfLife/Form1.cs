@@ -41,56 +41,64 @@ namespace FalconAlex_GameOfLife
             }
             return result;
         }
-        public static bool UpdateState(int x, int y)//Logic for updating the state of the cell
+        public static void UpdateState(int x, int y)//Logic for updating the state of the cell
         {
-            bool result;
             int count = CountNeighbors(x, y); //Store the count of neighbors for legibility
             if (universe[x, y])                          //Logic for living cells
             {
                 if (count == 2 || count == 3) //A living cell with 2 or 3 neighbors lives on
                 {
-                    result = true;
+                    scratch[x,y] = true;
                 }
                 else //In all other cases, the cell dies;
                 {
-                    result = false;
+                    scratch[x, y] = false;
                 }
             }
             else                                      //Logic for dead cells
             {
                 if (count == 3)//A dead cell with 3 neighbors will be born by reproduction
                 {
-                    result = true;
+                    scratch[x, y] = true;
                 }
                 else
                 {
-                    result = false;
+                    scratch[x, y] = false;
                 }
             }
-            return result;
         }
         public static void UpdateScratch() //Update the states of the cells on the scratch pad
         {
-            for (int x = 0; x < 100; x++)
+            for (int y = 0; y < 100; y++)
             {
-                for (int y = 0; y < 100; y++)
+                for (int x = 0; x < 100; x ++)
                 {
-                    scratch[x, y] = UpdateState(x, y);
+                    UpdateState(x, y);
+                }
+            }
+        }
+        public static void CleanScratch() //Reset the values of the scratchpad
+        {
+            for (int y = 0; y < 100; y++)
+            {
+                for (int x = 0; x < 100; x++)
+                {
+                    scratch[x,y] = false;
                 }
             }
         }
         public static void UpdateUniverse()//Call UpdateScratch and push the updated states to universe
         {
             UpdateScratch();
-            universe = scratch;
-
+            universe = scratch.Clone() as bool[,];
+            CleanScratch();
         }
         public static void RandomUniverse()
         {
             Random rand = new Random();
-            for (int x = 0; x < 100; x++)
+            for (int y = 0; y < 100; y++)
             {
-                for (int y = 0; y < 100; y++)
+                for (int x = 0; x < 100; x++)
                 {
 
                     if (rand.Next(3) == 0)
@@ -115,7 +123,7 @@ Color gridColor = Color.Black;
         public Form1()
         {
             InitializeComponent();
-            //RandomUniverse();
+            RandomUniverse();
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
@@ -172,13 +180,19 @@ Color gridColor = Color.Black;
                     {
                         e.Graphics.FillRectangle(cellBrush, cellRect);
                     }
-                    int count = CountNeighbors(x, y);
-                    if (count != 0)
+                    int neighbors = CountNeighbors(x, y);
+                    Font font = new Font("Arial", 8f);
+
+                    StringFormat stringFormat = new StringFormat();
+                    stringFormat.Alignment = StringAlignment.Center;
+                    stringFormat.LineAlignment = StringAlignment.Center;
+
+                    if (neighbors != 0)
                     {
-                        e.Graphics.DrawString(CountNeighbors(x, y).ToString(), DefaultFont, neighborBrush, new PointF(cellRect.Left, cellRect.Top));
+                        e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
                     }
-                    // Outline the cell with a pen
-                    e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+                        // Outline the cell with a pen
+                        e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
                 }
             }
 
