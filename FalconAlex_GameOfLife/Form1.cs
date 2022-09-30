@@ -27,13 +27,17 @@ namespace FalconAlex_GameOfLife
                         continue;
                     }
                     else
-                    { 
-                        if (universe[(x + j), (y + i)] && universe[(x + j), (y + i)] != universe[x, y]) //Count the cells around (but not including) the given cell's coordinates
+                    {
+                        if (universe[(x + j), (y + i)]) //Count active cells around given cell's coordinates
                         {
                             result++;
                         }
                     }
                 }
+            }
+            if(universe[x,y] == true) //Remove self from neighbors if active
+            {
+                result--;
             }
             return result;
         }
@@ -43,17 +47,13 @@ namespace FalconAlex_GameOfLife
             int count = CountNeighbors(x, y); //Store the count of neighbors for legibility
             if (universe[x, y])                          //Logic for living cells
             {
-                if (count < 2) //A living cell with less than 2 neighbors dies by under-population
-                {
-                    result = false;
-                }
-                else if (count > 3)//A living cell with more than 3 neighbors dies by over-population
-                {
-                    result = false;
-                }
-                else //A living cell with 2 or 3 neighbors lives on
+                if (count == 2 || count == 3) //A living cell with 2 or 3 neighbors lives on
                 {
                     result = true;
+                }
+                else //In all other cases, the cell dies;
+                {
+                    result = false;
                 }
             }
             else                                      //Logic for dead cells
@@ -87,13 +87,13 @@ namespace FalconAlex_GameOfLife
         }
         public static void RandomUniverse()
         {
+            Random rand = new Random();
             for (int x = 0; x < 100; x++)
             {
                 for (int y = 0; y < 100; y++)
                 {
-                    Random rand = new Random();
-                    int r = rand.Next(3);
-                    if (r == 0)
+
+                    if (rand.Next(3) == 0)
                     {
                         universe[x, y] = true;
                     }
@@ -115,7 +115,7 @@ Color gridColor = Color.Black;
         public Form1()
         {
             InitializeComponent();
-            RandomUniverse();
+            //RandomUniverse();
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
@@ -175,7 +175,7 @@ Color gridColor = Color.Black;
                     int count = CountNeighbors(x, y);
                     if (count != 0)
                     {
-                        e.Graphics.DrawString(CountNeighbors(x, y).ToString(), DefaultFont, neighborBrush, new PointF(cellRect.Left, cellRect.Top);
+                        e.Graphics.DrawString(CountNeighbors(x, y).ToString(), DefaultFont, neighborBrush, new PointF(cellRect.Left, cellRect.Top));
                     }
                     // Outline the cell with a pen
                     e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
