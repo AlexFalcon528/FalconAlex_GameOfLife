@@ -87,9 +87,9 @@ namespace FalconAlex_GameOfLife
         }
         public static void RandomUniverse()
         {
-            for (int x = 0; x <= 100; x++)
+            for (int x = 0; x < 100; x++)
             {
-                for (int y = 0; y <= 100; y++)
+                for (int y = 0; y < 100; y++)
                 {
                     Random rand = new Random();
                     int r = rand.Next(3);
@@ -115,18 +115,18 @@ Color gridColor = Color.Black;
         public Form1()
         {
             InitializeComponent();
-
+            RandomUniverse();
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
-            timer.Enabled = true; // start timer running
+            timer.Enabled = false; // start timer running
         }
 
         // Calculate the next generation of cells
         private void NextGeneration()
         {
             UpdateUniverse();
-
+            graphicsPanel1.Invalidate();
             // Increment generation count
             generations++;
 
@@ -153,7 +153,7 @@ Color gridColor = Color.Black;
 
             // A Brush for filling living cells interiors (color)
             Brush cellBrush = new SolidBrush(cellColor);
-
+            Brush neighborBrush = new SolidBrush(Color.Red);
             // Iterate through the universe in the y, top to bottom
             for (int y = 0; y < universe.GetLength(1); y++)
             {
@@ -172,7 +172,11 @@ Color gridColor = Color.Black;
                     {
                         e.Graphics.FillRectangle(cellBrush, cellRect);
                     }
-
+                    int count = CountNeighbors(x, y);
+                    if (count != 0)
+                    {
+                        e.Graphics.DrawString(CountNeighbors(x, y).ToString(), DefaultFont, neighborBrush, new PointF(cellRect.Left, cellRect.Top);
+                    }
                     // Outline the cell with a pen
                     e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
                 }
@@ -210,5 +214,12 @@ Color gridColor = Color.Black;
         {
             this.Close();
         }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = !timer.Enabled;
+        }
+
+
     }
 }
