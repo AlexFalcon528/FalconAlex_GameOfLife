@@ -18,52 +18,58 @@ namespace FalconAlex_GameOfLife
         public static int CountNeighbors(int x, int y) //Count neighbors in cardinal directions and diags
         {
             int result = 0;
-            for (int i = -1; i <= 1; i++) //Loop for y axis
+            if (universe != null)
             {
-                for (int j = -1; j <= 1; j++) //Loop for x axis
+                for (int i = -1; i <= 1; i++) //Loop for y axis
                 {
-                    if (x + j > 99 || y + i > 99 || x+j<0 || y+i<0)
+                    for (int j = -1; j <= 1; j++) //Loop for x axis
                     {
-                        continue;
-                    }
-                    else
-                    {
-                        if (universe[(x + j), (y + i)]) //Count active cells around given cell's coordinates
+                        if (x + j > 99 || y + i > 99 || x + j < 0 || y + i < 0)
                         {
-                            result++;
+                            continue;
+                        }
+                        else
+                        {
+                            if (universe[(x + j), (y + i)]) //Count active cells around given cell's coordinates
+                            {
+                                result++;
+                            }
                         }
                     }
                 }
-            }
-            if(universe[x,y] == true) //Remove self from neighbors if active
-            {
-                result--;
+                if (universe[x, y] == true) //Remove self from neighbors if active
+                {
+                    result--;
+                }
             }
             return result;
         }
         public static void UpdateState(int x, int y)//Logic for updating the state of the cell
         {
             int count = CountNeighbors(x, y); //Store the count of neighbors for legibility
-            if (universe[x, y])                          //Logic for living cells
+            if (universe != null)
             {
-                if (count == 2 || count == 3) //A living cell with 2 or 3 neighbors lives on
+                if (universe[x, y])                          //Logic for living cells
                 {
-                    scratch[x,y] = true;
+                    if (count == 2 || count == 3) //A living cell with 2 or 3 neighbors lives on
+                    {
+                        scratch[x, y] = true;
+                    }
+                    else //In all other cases, the cell dies;
+                    {
+                        scratch[x, y] = false;
+                    }
                 }
-                else //In all other cases, the cell dies;
+                else                                      //Logic for dead cells
                 {
-                    scratch[x, y] = false;
-                }
-            }
-            else                                      //Logic for dead cells
-            {
-                if (count == 3)//A dead cell with 3 neighbors will be born by reproduction
-                {
-                    scratch[x, y] = true;
-                }
-                else
-                {
-                    scratch[x, y] = false;
+                    if (count == 3)//A dead cell with 3 neighbors will be born by reproduction
+                    {
+                        scratch[x, y] = true;
+                    }
+                    else
+                    {
+                        scratch[x, y] = false;
+                    }
                 }
             }
         }
@@ -127,7 +133,7 @@ Color gridColor = Color.Black;
             // Setup the timer
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
-            timer.Enabled = false; // start timer running
+            timer.Enabled = false; // start timer disabled
         }
 
         // Calculate the next generation of cells
@@ -234,6 +240,27 @@ Color gridColor = Color.Black;
             timer.Enabled = !timer.Enabled;
         }
 
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            CleanScratch();
+            universe = null;
+            NextGeneration();
+            generations = 0;
+            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
 
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            NextGeneration();
+        }
+
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            RandomUniverse();
+            NextGeneration();
+            generations = 0;
+            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+        }
     }
 }
