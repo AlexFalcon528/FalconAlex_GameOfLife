@@ -237,7 +237,7 @@ Color gridColor = Color.Black;
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            timer.Enabled = !timer.Enabled;
+            timer.Enabled = false;
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -261,6 +261,11 @@ Color gridColor = Color.Black;
             NextGeneration();
             generations = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+        }
+
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            timer.Enabled = true;
         }
     }
 }
