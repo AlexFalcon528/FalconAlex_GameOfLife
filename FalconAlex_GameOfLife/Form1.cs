@@ -12,9 +12,14 @@ namespace FalconAlex_GameOfLife
 {
     public partial class Form1 : Form
     {
+        static int universeX = 100;
+        static int universeY = 100;
+        static int tickTime = 100;
+        static bool viewGrid = true;
+        static bool viewNeighbors = true;
         // The universe array
-        static bool[,] universe = new bool[100, 100];
-        static bool[,] scratch = new bool[100, 100];
+        static bool[,] universe = new bool[universeX,universeY];
+        static bool[,] scratch = new bool[universeX, universeY];
         public static int CountNeighbors(int x, int y) //Count neighbors in cardinal directions and diags
         {
             int result = 0;
@@ -24,9 +29,9 @@ namespace FalconAlex_GameOfLife
                 {
                     for (int j = -1; j <= 1; j++) //Loop for x axis
                     {
-                        if (x + j > 99 || y + i > 99 || x + j < 0 || y + i < 0)
+                        if (x + j > universeX-1 || y + i > universeY-1 || x + j < 0 || y + i < 0)
                         {
-                            continue;
+                            continue; //if oob, don't count
                         }
                         else
                         {
@@ -102,12 +107,12 @@ namespace FalconAlex_GameOfLife
         public static void RandomUniverse()
         {
             Random rand = new Random();
-            for (int y = 0; y < 100; y++)
+            for (int y = 0; y < universeY; y++)//loop for y axis
             {
-                for (int x = 0; x < 100; x++)
+                for (int x = 0; x < universeX; x++)//loop for x axis
                 {
 
-                    if (rand.Next(3) == 0)
+                    if (rand.Next(3) == 0) //set ~33% of cells to true
                     {
                         universe[x, y] = true;
                     }
@@ -131,21 +136,23 @@ Color gridColor = Color.Black;
             InitializeComponent();
             RandomUniverse();
             // Setup the timer
-            timer.Interval = 100; // milliseconds
+            timer.Interval = tickTime; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = false; // start timer disabled
         }
 
         // Calculate the next generation of cells
-        private void NextGeneration()
+        private void NextGeneration()//Processes called per tick, or upon clicking the next button
         {
-            UpdateUniverse();
-            graphicsPanel1.Invalidate();
+            UpdateUniverse();//Update the universe
+            graphicsPanel1.Invalidate();//Call to redraw universe
             // Increment generation count
             generations++;
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            //Update status strip living cells
+            toolStripStatusLabelCells.Text = "Living Cells = " + CountCells().ToString();
         }
 
         // The event called by the timer every Interval milliseconds.
@@ -193,12 +200,15 @@ Color gridColor = Color.Black;
                     stringFormat.Alignment = StringAlignment.Center;
                     stringFormat.LineAlignment = StringAlignment.Center;
 
-                    if (neighbors != 0)
+                    if (neighbors != 0 && viewNeighbors)
                     {
                         e.Graphics.DrawString(neighbors.ToString(), font, Brushes.Black, cellRect, stringFormat);
                     }
-                        // Outline the cell with a pen
+                    // Outline the cell with a pen
+                    if (viewGrid)
+                    {
                         e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+                    }
                 }
             }
 
@@ -230,17 +240,17 @@ Color gridColor = Color.Black;
             }
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)//Exit button
         {
             this.Close();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void toolStripButton1_Click(object sender, EventArgs e) //Pause
         {
             timer.Enabled = false;
         }
 
-        private void toolStripButton2_Click(object sender, EventArgs e)
+        private void toolStripButton2_Click(object sender, EventArgs e) //Erase
         {
             CleanScratch();
             universe = null;
@@ -250,12 +260,12 @@ Color gridColor = Color.Black;
 
         }
 
-        private void toolStripButton3_Click(object sender, EventArgs e)
+        private void toolStripButton3_Click(object sender, EventArgs e)//Next
         {
             NextGeneration();
         }
 
-        private void toolStripButton4_Click(object sender, EventArgs e)
+        private void toolStripButton4_Click(object sender, EventArgs e)//Random
         {
             RandomUniverse();
             NextGeneration();
@@ -263,9 +273,42 @@ Color gridColor = Color.Black;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
         }
 
-        private void toolStripButton5_Click(object sender, EventArgs e)
+        private void toolStripButton5_Click(object sender, EventArgs e)//Play
         {
             timer.Enabled = true;
         }
+
+        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        {
+
+        }
+        private int CountCells()//Count living cells in the current universe
+        {
+            int result = 0;
+            for (int y = 0; y < universeY; y++)//Loop for y axis
+            {
+                for (int x = 0; x < universeX; x++)//Loop for x axis
+                {
+                    if (universe[x, y])//If the cell is alive, add to the counter of living cells
+                    {
+                        result++;
+                    }
+                }
+            }
+            return result;
+        }
+
+        private void toolStripMenuViewGrid_CheckStateChanged(object sender, EventArgs e)
+        {
+            viewGrid = !viewGrid;//invert view grid bool (defaults to true)
+            graphicsPanel1.Invalidate();//Call to redraw universe
+        }
+
+        private void toolStripMenuViewNeighbors_CheckStateChanged(object sender, EventArgs e)
+        {
+            viewNeighbors = !viewNeighbors;//invert view neighbors bool (defaults to true)
+            graphicsPanel1.Invalidate();//Call to redraw universe
+        }
+
     }
 }
