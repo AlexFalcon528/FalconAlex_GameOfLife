@@ -22,8 +22,6 @@ namespace FalconAlex_GameOfLife
 }
 /* TODO: Saving the current universe to a text file. The current state and size of the universe should be able to be saved in PlainText file format. The file name should be chosen by the user with a save file dialog box. */
 /* TODO: Opening a previously saved universe. A previously saved PlainText file should be able to be read in and assigned to the current universe. Opening should also resize the current universe to match the size of the file being read. */
-/* TODO: Controlling how many milliseconds between new generations. The number of milliseconds between new generations should be adjustable through a dialog box.*/
-/* TODO: Controlling the current size of the universe. The width and height of the current universe should be able to be chosen through a modal dialog box.*/
 
 //OPTIONALS
 

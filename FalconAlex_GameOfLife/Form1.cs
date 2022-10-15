@@ -12,14 +12,17 @@ namespace FalconAlex_GameOfLife
 {
     public partial class Form1 : Form
     {
-        static int universeX = 100;
-        static int universeY = 100;
-        static int tickTime = 100;
+        public static int universeX;
+        public static int universeY;
+        public static int tickTime;
         static bool viewGrid = true;
         static bool viewNeighbors = true;
         // The universe array
         static bool[,] universe = new bool[universeX,universeY];
         static bool[,] scratch = new bool[universeX, universeY];
+
+
+        
         public static int CountNeighbors(int x, int y) //Count neighbors in cardinal directions and diags
         {
             int result = 0;
@@ -80,9 +83,9 @@ namespace FalconAlex_GameOfLife
         }
         public static void UpdateScratch() //Update the states of the cells on the scratch pad
         {
-            for (int y = 0; y < 100; y++)
+            for (int y = 0; y < universeY; y++)
             {
-                for (int x = 0; x < 100; x ++)
+                for (int x = 0; x < universeX; x ++)
                 {
                     UpdateState(x, y);
                 }
@@ -90,9 +93,9 @@ namespace FalconAlex_GameOfLife
         }
         public static void CleanScratch() //Reset the values of the scratchpad
         {
-            for (int y = 0; y < 100; y++)
+            for (int y = 0; y < universeY; y++)
             {
-                for (int x = 0; x < 100; x++)
+                for (int x = 0; x < universeX; x++)
                 {
                     scratch[x,y] = false;
                 }
@@ -133,12 +136,18 @@ Color gridColor = Color.Black;
 
         public Form1()
         {
+            //Read in settings
+            universeX = Properties.Settings.Default.XSize;
+            universeY = Properties.Settings.Default.YSize;
+            tickTime = Properties.Settings.Default.TickTime;
             InitializeComponent();
-            RandomUniverse();
             // Setup the timer
             timer.Interval = tickTime; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = false; // start timer disabled
+            universe = new bool[universeX, universeY];
+            scratch = new bool[universeX, universeY];
+            
         }
 
         // Calculate the next generation of cells
@@ -163,6 +172,7 @@ Color gridColor = Color.Black;
 
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e)
         {
+            timer.Interval = tickTime;
             // Calculate the width and height of each cell in pixels
             // CELL WIDTH = WINDOW WIDTH / NUMBER OF CELLS IN X
             int cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
@@ -275,6 +285,7 @@ Color gridColor = Color.Black;
 
         private void toolStripButton5_Click(object sender, EventArgs e)//Play
         {
+            timer.Interval = tickTime;
             timer.Enabled = true;
         }
 
@@ -310,5 +321,33 @@ Color gridColor = Color.Black;
             graphicsPanel1.Invalidate();//Call to redraw universe
         }
 
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsDialog dlg = new SettingsDialog();
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                tickTime = dlg.tickTime;
+                if(universeX != dlg.xSize||universeY != dlg.ySize)
+                {
+                    universeX = dlg.xSize;
+                    universeY = dlg.ySize;
+                    universe = null; //Delete the old arrays and make new ones with the new size options
+                    universe = new bool[universeX, universeY];
+                    scratch = null;
+                    scratch = new bool[universeX, universeY];
+                }
+                
+                graphicsPanel1.Invalidate();
+            }
+
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.TickTime = tickTime;//Update Settings.Settings
+            Properties.Settings.Default.XSize = universeX;
+            Properties.Settings.Default.YSize = universeY;
+            Properties.Settings.Default.Save();//Save new settings
+        }
     }
 }
