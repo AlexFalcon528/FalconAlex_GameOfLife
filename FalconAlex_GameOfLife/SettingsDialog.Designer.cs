@@ -38,12 +38,13 @@ namespace FalconAlex_GameOfLife
             this.XSize = new System.Windows.Forms.TextBox();
             this.YSize = new System.Windows.Forms.TextBox();
             this.SquareArray = new System.Windows.Forms.CheckBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // OK
             // 
             this.OK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OK.Location = new System.Drawing.Point(44, 109);
+            this.OK.Location = new System.Drawing.Point(12, 108);
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(75, 23);
             this.OK.TabIndex = 0;
@@ -52,7 +53,8 @@ namespace FalconAlex_GameOfLife
             // 
             // Cancel
             // 
-            this.Cancel.Location = new System.Drawing.Point(126, 108);
+            this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.Cancel.Location = new System.Drawing.Point(145, 108);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 23);
             this.Cancel.TabIndex = 1;
@@ -119,6 +121,15 @@ namespace FalconAlex_GameOfLife
             this.SquareArray.Text = "Square Array";
             this.SquareArray.UseVisualStyleBackColor = true;
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(45, 92);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(147, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Max recommended: 150 x150";
+            // 
             // SettingsDialog
             // 
             this.AcceptButton = this.OK;
@@ -126,6 +137,7 @@ namespace FalconAlex_GameOfLife
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.Cancel;
             this.ClientSize = new System.Drawing.Size(232, 143);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.SquareArray);
             this.Controls.Add(this.YSize);
             this.Controls.Add(this.XSize);
@@ -158,5 +170,6 @@ namespace FalconAlex_GameOfLife
         private System.Windows.Forms.TextBox XSize;
         private System.Windows.Forms.TextBox YSize;
         private System.Windows.Forms.CheckBox SquareArray;
+        private System.Windows.Forms.Label label4;
     }
 }
