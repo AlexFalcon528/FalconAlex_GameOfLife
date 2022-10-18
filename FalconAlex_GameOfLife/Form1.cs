@@ -18,6 +18,7 @@ namespace FalconAlex_GameOfLife
         public static int tickTime;
         static bool viewGrid = true;
         static bool viewNeighbors = true;
+        static bool viewHUD = true;
         // The universe array
         static bool[,] universe = new bool[universeX,universeY];
         static bool[,] scratch = new bool[universeX, universeY];
@@ -148,7 +149,7 @@ Color gridColor = Color.Black;
             timer.Enabled = false; // start timer disabled
             universe = new bool[universeX, universeY];
             scratch = new bool[universeX, universeY];
-            
+            UpdateHUD();
         }
 
         // Calculate the next generation of cells
@@ -161,8 +162,10 @@ Color gridColor = Color.Black;
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+            HUDGen.Text = "Gen: " + generations.ToString();
             //Update status strip living cells
             toolStripStatusLabelCells.Text = "Living Cells = " + CountCells().ToString();
+            HUDCells.Text = "Cells: " + CountCells().ToString();
         }
 
         // The event called by the timer every Interval milliseconds.
@@ -328,16 +331,17 @@ Color gridColor = Color.Black;
             if (DialogResult.OK == dlg.ShowDialog())
             {
                 tickTime = dlg.tickTime;
-                if(universeX != dlg.xSize||universeY != dlg.ySize)
+                if(universeX != dlg.x||universeY != dlg.y)
                 {
-                    universeX = dlg.xSize;
-                    universeY = dlg.ySize;
+                    universeX = dlg.x;
+                    universeY = dlg.y;
                     universe = null; //Delete the old arrays and make new ones with the new size options
                     universe = new bool[universeX, universeY];
                     scratch = null;
                     scratch = new bool[universeX, universeY];
+                    
                 }
-                
+                UpdateHUD();
                 graphicsPanel1.Invalidate();
             }
 
@@ -444,16 +448,17 @@ Color gridColor = Color.Black;
                 }
                 reader.Close();
                 graphicsPanel1.Invalidate();
+                UpdateHUD();
             }
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        private void newToolStripMenuItem_Click(object sender, EventArgs e) //this is titled new but is actually import. I realized too late and changing it now would break everything
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            OpenFileDialog dlg = new OpenFileDialog(); //Open a dialog to select a file
             dlg.Filter = "All Files|*.*|Cells|*.cells";
             dlg.FilterIndex = 2;
 
-            if (DialogResult.OK == dlg.ShowDialog())
+            if (DialogResult.OK == dlg.ShowDialog()) //If confirmed with ok button
             {
                 StreamReader reader = new StreamReader(dlg.FileName);
                 int maxWidth = 0;
@@ -464,11 +469,11 @@ Color gridColor = Color.Black;
                     string row = reader.ReadLine();
                     if (row.First() != '!')
                     {
-                        maxHeight++;
+                        maxHeight++;//count height
                     }
-                    if (maxWidth != row.Length)
+                    if (maxWidth < row.Length)
                     {
-                        maxWidth = row.Length;
+                        maxWidth = row.Length;//take longest row
                     }
                 }
 
@@ -478,7 +483,7 @@ Color gridColor = Color.Black;
                 while (!reader.EndOfStream && yPos<universeY)
                 {
                     // Read one row at a time.
-                    string row = reader.ReadLine();
+                    string row = reader.ReadLine(); //read file again for alive/dead cells
                     if (row.First() != '!')
                     {
                         for (int xPos = 0; xPos < row.Length; xPos++)
@@ -487,7 +492,7 @@ Color gridColor = Color.Black;
                             {
                                 if (row[xPos] == 'O')
                                 {
-                                    universe[xPos, yPos] = true;
+                                    universe[xPos, yPos] = true;//transscribe data to universe
                                 }
                                 else
                                 {
@@ -499,8 +504,59 @@ Color gridColor = Color.Black;
                     }
 
                 }
-                reader.Close();
+                reader.Close();//close file, redraw universe, and update hub
                 graphicsPanel1.Invalidate();
+                UpdateHUD();
+            }
+        }
+
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Reload to settings from when the app was previously closed
+            universeX = Properties.Settings.Default.XSize;
+            universeY = Properties.Settings.Default.YSize;
+            tickTime = Properties.Settings.Default.TickTime;
+            universe = null; //Delete the old arrays and make new ones with the new size options
+            universe = new bool[universeX, universeY];
+            scratch = null;
+            scratch = new bool[universeX, universeY];
+            graphicsPanel1.Invalidate();
+            UpdateHUD();
+        }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Reset to default settings
+            universeX = 100;
+            universeY = 100;
+            tickTime = 100;
+            universe = null; //Delete the old arrays and make new ones with the new size options
+            universe = new bool[universeX, universeY];
+            scratch = null;
+            scratch = new bool[universeX, universeY];
+            graphicsPanel1.Invalidate();
+            UpdateHUD();
+        }
+        private void UpdateHUD()//Call this when changing settings to update the HUD
+        {
+            if (viewHUD&&HUDSize !=null && HUDTickTime !=null)
+            {
+                HUDSize.Text = universeX.ToString() + ", " + universeY.ToString();
+                HUDTickTime.Text = tickTime.ToString() + "ms";
+            }
+        }
+
+
+        private void HUDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            viewHUD = !viewHUD;//invert view HUD bool (defaults to true)
+            if (viewHUD)
+            {
+                HUDPanel.Visible = true;
+            }
+            else
+            {
+                HUDPanel.Visible = false;
             }
         }
     }

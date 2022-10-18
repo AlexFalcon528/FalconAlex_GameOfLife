@@ -13,30 +13,39 @@ namespace FalconAlex_GameOfLife
     public partial class SettingsDialog : Form
     {
         public int tickTime = 100;
-        public int xSize = 100;
-        public int ySize = 100;
+        public int x = 100;
+        public int y = 100;
         public SettingsDialog()
         {
             InitializeComponent();
-            TickTime.Text = Form1.tickTime.ToString();
+            TickTime.Text = Form1.tickTime.ToString(); //Load current settings to the placeholder texts
             XSize.Text = Form1.universeX.ToString();
             YSize.Text = Form1.universeY.ToString();
-            SquareArray.Checked = true;
+            SquareArray.Checked = true; //Squares look better so default to square array
             
         }
 
         private void SettingsDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
             bool isSquare = SquareArray.Checked;
-            int.TryParse(TickTime.Text, out tickTime);
-            int.TryParse(XSize.Text, out xSize);
+            if (!int.TryParse(TickTime.Text, out tickTime))//Try to read the inputs as ints and output them to their respective variables if possible, else output previous settings
+            {
+                tickTime = Form1.tickTime;
+            }
+            if (!int.TryParse(XSize.Text, out x))//Try to read the inputs as ints and output them to their respective variables if possible, else output previous settings
+            {
+                x = Form1.universeX;
+            }
             if (isSquare)
             {
-                ySize = xSize;
+                y = x;
             }
             else
             {
-                int.TryParse(YSize.Text, out ySize);
+                if (!int.TryParse(YSize.Text, out y))//Try to read the inputs as ints and output them to their respective variables if possible, else output previous settings
+                {
+                    y = Form1.universeY;
+                }
             }
             
         }
